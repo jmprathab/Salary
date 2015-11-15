@@ -25,13 +25,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="@dimen/activity_horizontal_margin"
-                android:background="@color/colorPrimaryLight"
                 android:clickable="true"
-                android:elevation="4dp"
-                android:gravity="center"
                 android:onClick="dialogDecision"
                 android:padding="10dp"
-                android:text="Date"
+                android:text="Click to select Date"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
 
             <TextView
@@ -40,13 +38,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="@dimen/activity_horizontal_margin"
-                android:background="@color/colorPrimaryLight"
                 android:clickable="true"
-                android:elevation="4dp"
-                android:gravity="center"
                 android:onClick="dialogDecision"
                 android:padding="10dp"
-                android:text="In Time"
+                android:text="Click to select In-Time"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
 
             <TextView
@@ -55,13 +51,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="@dimen/activity_horizontal_margin"
-                android:background="@color/colorPrimaryLight"
                 android:clickable="true"
-                android:elevation="4dp"
-                android:gravity="center"
                 android:onClick="dialogDecision"
                 android:padding="10dp"
-                android:text="Out Time"
+                android:text="Click to select Out Time"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
 
             <TextView
@@ -70,11 +64,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="@dimen/activity_horizontal_margin"
-                android:background="@color/colorPrimaryLight"
-                android:elevation="4dp"
-                android:gravity="center"
                 android:padding="10dp"
                 android:text="Total Hours Worked"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
 
             <TextView
@@ -83,11 +75,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="@dimen/activity_horizontal_margin"
-                android:background="@color/colorPrimaryLight"
-                android:elevation="4dp"
-                android:gravity="center"
                 android:padding="10dp"
                 android:text="Regular Hours Worked"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
 
             <TextView
@@ -96,11 +86,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_margin="@dimen/activity_horizontal_margin"
-                android:background="@color/colorPrimaryLight"
-                android:elevation="4dp"
-                android:gravity="center"
                 android:padding="10dp"
                 android:text="OT Hours Worked"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
 
             <Button
@@ -110,7 +98,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="@dimen/activity_horizontal_margin"
                 android:background="@color/colorAccent"
-                android:elevation="4dp"
                 android:text="Add Details"
                 android:textAllCaps="false"
                 android:textColor="@color/icons" />

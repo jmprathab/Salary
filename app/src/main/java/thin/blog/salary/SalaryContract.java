@@ -15,5 +15,6 @@ public final class SalaryContract {
         public static final String COLUMN_NAME_IN_TIME = "in_time";
         public static final String COLUMN_NAME_OUT_TIME = "out_time";
         public static final String COLUMN_NAME_PAY = "pay";
+        public static final String COLUMN_NAME_OTPAY = "ot_pay";
     }
 }

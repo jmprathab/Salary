@@ -23,41 +23,51 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
+                android:layout_margin="@dimen/activity_horizontal_margin"
                 android:clickable="true"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="From Date"
-                android:textSize="30sp" />
+                android:text="Select Starting Date"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp" />
 
-            <DatePicker
+            <thin.blog.salary.CustomDatePicker
                 android:id="@+id/fromPicker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/activity_horizontal_margin" />
 
             <TextView
                 android:id="@+id/in_time"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
+                android:layout_margin="@dimen/activity_horizontal_margin"
                 android:clickable="true"
                 android:gravity="center"
                 android:padding="10dp"
-                android:text="To Date"
-                android:textSize="30sp" />
+                android:text="Select Ending Date"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp" />
 
-            <DatePicker
+            <thin.blog.salary.CustomDatePicker
                 android:id="@+id/toPicker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/activity_horizontal_margin" />
 
             <Button
                 android:id="@+id/display"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Display" />
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:background="@color/colorAccent"
+                android:text="Display"
+                android:textAllCaps="false"
+                android:textColor="@color/icons" />
         </LinearLayout>
     </ScrollView>
 

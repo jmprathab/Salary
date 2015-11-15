@@ -5,11 +5,13 @@
     android:layout_height="wrap_content"
     android:layout_below="@id/date"
     android:layout_margin="5dp"
-    card_view:cardCornerRadius="4dp">
+    android:elevation="@dimen/cardview_default_elevation"
+    card_view:cardCornerRadius="@dimen/cardview_default_radius">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
         android:background="@color/icons"
         android:orientation="vertical"
         android:padding="0dip">
@@ -19,10 +21,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:gravity="left"
+            android:gravity="center"
             android:padding="5dip"
             android:text="Date"
-            android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/icons"
             android:textSize="20sp" />
 
@@ -30,27 +31,32 @@
             android:id="@+id/in"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/card_view_vertical_margin"
             android:padding="5dip"
-            android:text="In"
-            android:textSize="10sp" />
+            android:text="In Time :"
+            android:textColor="@color/colorPrimary"
+            android:textSize="15sp" />
 
 
         <TextView
             android:id="@+id/out"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/card_view_vertical_margin"
             android:padding="5dip"
-            android:text="Out"
-            android:textSize="10sp" />
-
+            android:text="Out Time :"
+            android:textColor="@color/colorPrimary"
+            android:textSize="15sp" />
 
         <TextView
-            android:id="@+id/ot"
+            android:id="@+id/pay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/card_view_vertical_margin"
             android:padding="5dip"
-            android:text="OT"
-            android:textSize="10sp" />
+            android:text="Pay :"
+            android:textColor="@color/colorPrimary"
+            android:textSize="15sp" />
 
     </LinearLayout>
 

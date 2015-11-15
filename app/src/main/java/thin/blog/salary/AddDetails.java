@@ -3,10 +3,14 @@ package thin.blog.salary;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,43 +24,28 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class AddDetails extends AppCompatActivity {
     static final int DATE_DIALOG_ID = 0;
     static final int IN_TIME_DIALOG_ID = 1;
     static final int OUT_TIME_DIALOG_ID = 2;
 
-    //constant variables for indexing arrays
-    static final int CONST_HOUR = 0;
-    static final int CONST_MINUTE = 1;
-    static final int CONST_YEAR = 0;
-    static final int CONST_MONTH = 1;
-    static final int CONST_DAY = 2;
-
     Toolbar toolbar;
-    Calendar calendar;
     TextView date, inTime, outTime, totalHoursWorked, regularHoursWorked, otHoursWorked;
     Button addDetails;
 
     boolean isInTimeSet, isOutTimeSet;
 
-    int[][] currentDateTime = new int[2][];
-
-    int[] selectedDate = new int[3];
-    int[] selectedInTime = new int[2];
-    int[] selectedOutTime = new int[2];
-
     int[] cTotalHoursWorked, cRegularHoursWorked, cOtHoursWorked;
     SimpleDateFormat dateFormat, timeFormat;
-    GregorianCalendar end, start;
+    GregorianCalendar current, selected, start, end;
 
     private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            selectedDate[CONST_YEAR] = year;
-            selectedDate[CONST_MONTH] = monthOfYear;
-            selectedDate[CONST_DAY] = dayOfMonth;
-            setDateOnView(date, year, monthOfYear, dayOfMonth);
+            selected.set(year, monthOfYear, dayOfMonth);
+            setDateOnView(date, selected);
         }
     };
 
@@ -64,10 +53,8 @@ public class AddDetails extends AppCompatActivity {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             isInTimeSet = true;
-            selectedInTime[CONST_HOUR] = hourOfDay;
-            selectedInTime[CONST_MINUTE] = minute;
-            start.set(selectedDate[CONST_YEAR], selectedDate[CONST_MONTH], selectedDate[CONST_DAY], hourOfDay, minute);
-            setTimeOnView(inTime, hourOfDay, minute);
+            start.set(selected.get(Calendar.YEAR), selected.get(Calendar.MONTH), selected.get(Calendar.DAY_OF_MONTH), hourOfDay, minute, 0);
+            setTimeOnView(inTime, start);
             if (isOutTimeSet) {
                 calculateWorkedHours();
             }
@@ -77,70 +64,66 @@ public class AddDetails extends AppCompatActivity {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             isOutTimeSet = true;
-            selectedOutTime[CONST_HOUR] = hourOfDay;
-            selectedOutTime[CONST_MINUTE] = minute;
-            end.set(selectedDate[CONST_YEAR], selectedDate[CONST_MONTH], selectedDate[CONST_DAY], hourOfDay, minute);
+            end.set(selected.get(Calendar.YEAR), selected.get(Calendar.MONTH), selected.get(Calendar.DAY_OF_MONTH), hourOfDay, minute, 0);
             boolean isValid = calculateWorkedHours();
             if (isValid) {
-                setTimeOnView(outTime, hourOfDay, minute);
+                setTimeOnView(outTime, end);
             }
         }
     };
 
+
     private static int[] getHoursAndMinutes(long minutes) {
-        int[] data = new int[2];
+        int[] data = new int[]{0, 0};
         if (minutes < -1) {
             return data;
         }
-        data[CONST_HOUR] = (int) (minutes / 60);
-        data[CONST_MINUTE] = (int) (minutes % 60);
+        data[0] = (int) minutes / 60;
+        data[1] = (int) minutes % 60;
         return data;
     }
 
     private boolean calculateWorkedHours() {
         long difference = end.getTimeInMillis() - start.getTimeInMillis();
-        if (difference <= 0) {
+        if (end.getTimeInMillis() <= start.getTimeInMillis()) {
             createToast("Invalid Time Selected", Toast.LENGTH_SHORT);
             resetViews();
             return false;
         }
-        long seconds = difference / 1000;
-        long minutes = seconds / 60;
-        cTotalHoursWorked[CONST_HOUR] = getHoursAndMinutes(minutes)[CONST_HOUR];
-        cTotalHoursWorked[CONST_MINUTE] = getHoursAndMinutes(minutes)[CONST_MINUTE];
-        totalHoursWorked.setText("Total : " + cTotalHoursWorked[CONST_HOUR] + " Hours " + cTotalHoursWorked[CONST_MINUTE] + " Minutes");
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(difference);
+        cTotalHoursWorked = getHoursAndMinutes(minutes);
+        totalHoursWorked.setText("Total : " + cTotalHoursWorked[0] + " Hours " + cTotalHoursWorked[1] + " Minutes");
         calculateRegularAndOt(minutes);
         return true;
     }
 
     private void resetViews() {
-        outTime.setText("Out Time");
+        outTime.setText("Click to select Out Time");
         totalHoursWorked.setText("Total Hours Worked");
         regularHoursWorked.setText("Regular Hours Worked");
         otHoursWorked.setText("OT Hours Worked");
-        cTotalHoursWorked[CONST_HOUR] = 0;
-        cTotalHoursWorked[CONST_MINUTE] = 0;
-        cOtHoursWorked[CONST_HOUR] = 0;
-        cOtHoursWorked[CONST_MINUTE] = 0;
-        cRegularHoursWorked[CONST_HOUR] = 0;
-        cRegularHoursWorked[CONST_MINUTE] = 0;
 
+        cTotalHoursWorked[0] = 0;
+        cTotalHoursWorked[1] = 0;
+        cOtHoursWorked[0] = 0;
+        cOtHoursWorked[1] = 0;
+        cRegularHoursWorked[0] = 0;
+        cRegularHoursWorked[1] = 0;
     }
 
-    private void setTimeOnView(TextView time, int hourOfDay, int minute) {
-        if (time.getId() == R.id.in_time) {
-            String formatted = timeFormat.format(start.getTime());
+    private void setTimeOnView(TextView view, GregorianCalendar time) {
+        if (view.getId() == R.id.in_time) {
+            time.setTimeZone(TimeZone.getDefault());
+            String formatted = timeFormat.format(time.getTime());
             inTime.setText("In Time : " + formatted);
-        } else if (time.getId() == R.id.out_time) {
-            String formatted = timeFormat.format(end.getTime());
+        } else if (view.getId() == R.id.out_time) {
+            String formatted = timeFormat.format(time.getTime());
             outTime.setText("Out Time : " + formatted);
         }
-
     }
 
-    private void setDateOnView(TextView date, int year, int month, int day) {
-        GregorianCalendar dateToSet = new GregorianCalendar(year, month, day);
-        String formatted = dateFormat.format(dateToSet.getTime());
+    private void setDateOnView(TextView date, GregorianCalendar selected) {
+        String formatted = dateFormat.format(selected.getTime());
         date.setText("Date : " + formatted);
     }
 
@@ -148,25 +131,26 @@ public class AddDetails extends AppCompatActivity {
         regularHoursWorked.setText("Regular Hours Worked");
         otHoursWorked.setText("OT Hours Worked");
         if (minutes < 240) {
-            cRegularHoursWorked[CONST_HOUR] = getHoursAndMinutes(0)[CONST_HOUR];
-            cRegularHoursWorked[CONST_MINUTE] = getHoursAndMinutes(0)[CONST_MINUTE];
-            cOtHoursWorked[CONST_HOUR] = getHoursAndMinutes(minutes)[CONST_HOUR];
-            cOtHoursWorked[CONST_MINUTE] = getHoursAndMinutes(minutes)[CONST_MINUTE];
+            cRegularHoursWorked = getHoursAndMinutes(0);
+            cOtHoursWorked = getHoursAndMinutes(minutes);
+        } else if (minutes == 240) {
+            cRegularHoursWorked = getHoursAndMinutes(240);
+            cOtHoursWorked = getHoursAndMinutes(0);
+        } else if (minutes == 480) {
+            cRegularHoursWorked = getHoursAndMinutes(480);
+            cOtHoursWorked = getHoursAndMinutes(0);
         } else if (minutes > 480) {
-            cRegularHoursWorked[CONST_HOUR] = getHoursAndMinutes(480)[CONST_HOUR];
-            cRegularHoursWorked[CONST_MINUTE] = getHoursAndMinutes(480)[CONST_MINUTE];
+            cRegularHoursWorked = getHoursAndMinutes(480);
             minutes = minutes - 480;
-            cOtHoursWorked[CONST_HOUR] = getHoursAndMinutes(minutes)[CONST_HOUR];
-            cOtHoursWorked[CONST_MINUTE] = getHoursAndMinutes(minutes)[CONST_MINUTE];
+            cOtHoursWorked = getHoursAndMinutes(minutes);
+
         } else if (minutes > 240 && minutes < 480) {
-            cRegularHoursWorked[CONST_HOUR] = getHoursAndMinutes(240)[CONST_HOUR];
-            cRegularHoursWorked[CONST_MINUTE] = getHoursAndMinutes(240)[CONST_MINUTE];
+            cRegularHoursWorked = getHoursAndMinutes(240);
             minutes = minutes - 240;
-            cOtHoursWorked[CONST_HOUR] = getHoursAndMinutes(minutes)[CONST_HOUR];
-            cOtHoursWorked[CONST_MINUTE] = getHoursAndMinutes(minutes)[CONST_MINUTE];
+            cOtHoursWorked = getHoursAndMinutes(minutes);
         }
-        regularHoursWorked.setText("Regular : " + cRegularHoursWorked[CONST_HOUR] + " Hours " + cRegularHoursWorked[CONST_MINUTE] + " Minutes");
-        otHoursWorked.setText("OT : " + cOtHoursWorked[CONST_HOUR] + " Hours " + cOtHoursWorked[CONST_MINUTE] + " Minutes");
+        regularHoursWorked.setText("Regular : " + cRegularHoursWorked[0] + " Hours " + cRegularHoursWorked[1] + " Minutes");
+        otHoursWorked.setText("OT : " + cOtHoursWorked[0] + " Hours " + cOtHoursWorked[1] + " Minutes");
     }
 
     @Override
@@ -175,6 +159,22 @@ public class AddDetails extends AppCompatActivity {
         setContentView(R.layout.activity_add_details);
         setToolbar();
         initialize();
+        addDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isInTimeSet && isOutTimeSet) {
+                    SalaryDbHelper dbHelper = new SalaryDbHelper(AddDetails.this);
+                    long id = dbHelper.insertDetails(selected.getTimeInMillis(), start.getTimeInMillis(), end.getTimeInMillis(), Salary.getRegularPay(), Salary.getOtPay());
+                    if (id > 0) {
+                        createToast("Details have been added into database :-)\t", Toast.LENGTH_SHORT);
+                        startActivity(new Intent(AddDetails.this, Home.class));
+                        finish();
+                    }
+                } else {
+                    createToast("Set Details to add to Database", Toast.LENGTH_SHORT);
+                }
+            }
+        });
     }
 
     private void setToolbar() {
@@ -193,33 +193,23 @@ public class AddDetails extends AppCompatActivity {
         regularHoursWorked = (TextView) findViewById(R.id.regular_hours_worked);
         addDetails = (Button) findViewById(R.id.add_details);
 
+        current = new GregorianCalendar();
+        selected = new GregorianCalendar();
+        start = new GregorianCalendar();
+        end = new GregorianCalendar();
+
         isInTimeSet = false;
         isOutTimeSet = false;
 
-        cTotalHoursWorked = new int[2];
-        cRegularHoursWorked = new int[2];
-        cOtHoursWorked = new int[2];
-        calendar = Calendar.getInstance();
-        currentDateTime[0] = new int[3];
-        currentDateTime[1] = new int[2];
-        currentDateTime[0][CONST_YEAR] = calendar.get(Calendar.YEAR);
-        currentDateTime[0][CONST_MONTH] = calendar.get(Calendar.MONTH);
-        currentDateTime[0][CONST_DAY] = calendar.get(Calendar.DAY_OF_MONTH);
-        currentDateTime[1][CONST_HOUR] = calendar.get(Calendar.HOUR_OF_DAY);
-        currentDateTime[1][CONST_MINUTE] = calendar.get(Calendar.MINUTE);
+        cTotalHoursWorked = new int[]{0, 0};
+        cRegularHoursWorked = new int[]{0, 0};
+        cOtHoursWorked = new int[]{0, 0};
 
-        selectedDate[CONST_YEAR] = currentDateTime[0][CONST_YEAR];
-        selectedDate[CONST_MONTH] = currentDateTime[0][CONST_MONTH];
-        selectedDate[CONST_DAY] = currentDateTime[0][CONST_DAY];
-        selectedInTime[0] = selectedOutTime[0] = currentDateTime[1][CONST_HOUR];
-        selectedInTime[1] = selectedOutTime[1] = currentDateTime[1][CONST_MINUTE];
         dateFormat = new SimpleDateFormat("dd-MMMM-yyyy", Locale.ENGLISH);
         dateFormat.setTimeZone(TimeZone.getDefault());
         timeFormat = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
         timeFormat.setTimeZone(TimeZone.getDefault());
-        start = new GregorianCalendar();
-        end = new GregorianCalendar();
-        setDateOnView(date, selectedDate[CONST_YEAR], selectedDate[CONST_MONTH], selectedDate[CONST_DAY]);
+        setDateOnView(date, selected);
     }
 
     public void dialogDecision(View v) {
@@ -244,11 +234,11 @@ public class AddDetails extends AppCompatActivity {
     protected Dialog onCreateDialog(int id) {
         switch (id) {
             case DATE_DIALOG_ID:
-                return new DatePickerDialog(this, datePickerListener, currentDateTime[0][CONST_YEAR], currentDateTime[0][CONST_MONTH], currentDateTime[0][CONST_DAY]);
+                return new DatePickerDialog(this, datePickerListener, current.get(Calendar.YEAR), current.get(Calendar.MONTH), current.get(Calendar.DAY_OF_MONTH));
             case IN_TIME_DIALOG_ID:
-                return new TimePickerDialog(this, onInTimeSetListener, currentDateTime[1][CONST_HOUR], currentDateTime[1][CONST_MINUTE], false);
+                return new TimePickerDialog(this, onInTimeSetListener, current.get(Calendar.HOUR_OF_DAY), current.get(Calendar.MINUTE), false);
             case OUT_TIME_DIALOG_ID:
-                return new TimePickerDialog(this, onOutTimeSetListener, selectedInTime[CONST_HOUR], selectedInTime[CONST_MINUTE], false);
+                return new TimePickerDialog(this, onOutTimeSetListener, current.get(Calendar.HOUR_OF_DAY), current.get(Calendar.MINUTE), false);
         }
         return null;
     }
@@ -264,12 +254,41 @@ public class AddDetails extends AppCompatActivity {
         toast.show();
     }
 
-    private String getDateForDatabase(GregorianCalendar date) {
-        String data = new String();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        format.format(date.getTime());
-        data = date.get(Calendar.YEAR) + "-" + date.get(Calendar.MONTH) + "-" + date.get(Calendar.DAY_OF_MONTH) + " " + date.get(Calendar.HOUR_OF_DAY) + ":" + date.get(Calendar.MINUTE) + ":" + date.get(Calendar.SECOND);
-        Toast.makeText(this, data, Toast.LENGTH_LONG).show();
-        return data;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_home_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.help:
+                return true;
+            case R.id.about:
+                startActivity(new Intent(AddDetails.this, About.class));
+                return true;
+            case R.id.settings:
+                Intent intent = new Intent(AddDetails.this, UserSettingActivity.class);
+                startActivity(intent);
+                break;
+            case android.R.id.home:
+                Intent i = new Intent(AddDetails.this, Home.class);
+                startActivity(i);
+                finish();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(AddDetails.this, Home.class);
+        startActivity(i);
+        finish();
     }
 }
